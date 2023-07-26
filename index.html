@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body>
+    <div
+      x-data="store"
+      class="min-h-screen bg-indigo-50 flex flex-col items-center justify-center"
+    >
+      <!-- chat box -->
+
+      <div class="w-80 h-96 flex flex-col border shadow-md bg-white">
+        <!-- login form -->
+
+        <div x-show="showLoginForm" class="p-2 space-y-4">
+          <div class="font-semibold">
+            <a class="hover:underline" href="#">CHAT BOY</a>
+          </div>
+
+          <label class="block" for="">Enter Name:</label>
+          <form @submit.prevent="handleLogin">
+            <input
+              type="text"
+              x-model="fullName"
+              class="border rounded-lg outline-none px-2 py-1"
+            />
+
+            <button
+              type="submit"
+              class="border rounded-lg px-2 py-1 bg-green-400"
+            >
+              Join Chat
+            </button>
+          </form>
+        </div>
+
+        <!-- end login form -->
+
+        <!-- chat messages -->
+
+        <div
+          x-show="!showLoginForm"
+          class="flex items-center justify-between border-b p-2"
+        >
+          <!-- user info -->
+          <div class="flex items-center">
+            <img class="rounded-full w-10 h-10" :src="avatar_url" />
+            <div class="pl-2">
+              <div class="font-semibold">
+                <a class="hover:underline" href="#" x-text="fullName"></a>
+              </div>
+              <div class="text-xs text-gray-600">Online</div>
+            </div>
+          </div>
+          <!-- end user info -->
+          <!-- chat box action -->
+          <div>
+            <a class="inline-flex hover:bg-indigo-50 rounded-full p-2" href="#">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                />
+              </svg>
+            </a>
+
+            <button
+              class="inline-flex hover:bg-indigo-50 rounded-full p-2"
+              type="button"
+              @click="handleLogout"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <!-- end chat box action -->
+        </div>
+
+        <div x-show="!showLoginForm" class="flex-1 px-4 py-4 overflow-y-auto">
+          <!-- chat message -->
+
+          <template x-if="chat_messages.length > 0">
+            <ul>
+              <template x-for="chat_message in chat_messages"
+                ><li>
+                  <div class="flex items-center mb-4">
+                    <div
+                      class="flex-none flex flex-col items-center space-y-1 mr-4"
+                    >
+                      <img
+                        class="rounded-full w-10 h-10"
+                        :src="chat_message.avatar_url"
+                      />
+                      <a
+                        href="#"
+                        class="block text-xs hover:underline"
+                        x-text="chat_message.fullName"
+                      ></a>
+                    </div>
+                    <div
+                      class="flex-1 bg-indigo-400 text-white p-2 rounded-lg mb-2 relative"
+                    >
+                      <div x-text="chat_message.message"></div>
+
+                      <!-- arrow -->
+                      <div
+                        class="absolute left-0 top-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-indigo-400"
+                      ></div>
+                      <!-- end arrow -->
+                    </div>
+                  </div>
+                </li></template
+              >
+            </ul>
+          </template>
+
+          <!-- end chat message -->
+        </div>
+
+        <div x-show="!showLoginForm" class="border-t p-2">
+          <form @submit.prevent="submitMessage" class="flex items-center">
+            <!-- chat input action -->
+            <div>
+              <button
+                class="inline-flex hover:bg-indigo-50 rounded-full p-2"
+                type="button"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
+            </div>
+            <!-- end chat input action -->
+
+            <div class="w-full mx-2">
+              <input
+                class="w-full rounded-full border border-gray-200 outline-none px-2 py-1"
+                type="text"
+                value=""
+                placeholder="Aa"
+                autofocus
+                x-model="message"
+              />
+            </div>
+
+            <!-- chat send action -->
+
+            <div>
+              <button
+                class="inline-flex hover:bg-indigo-50 rounded-full p-2"
+                type="button"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- end chat send action -->
+          </form>
+        </div>
+
+        <!-- end chat messages -->
+      </div>
+
+      <!-- end chat box -->
+    </div>
+
+    <script type="text/javascript">
+
+      document.addEventListener("alpine:init", () => {
+        var storeData = {
+          fullName: null,
+          showLoginForm: true,
+          message: null,
+          chat_messages: [],
+          avatar_url:
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Cuddles",
+          socket: null,
+
+          init() {
+            this.socket = new WebSocket(
+              "wss://free.nyc1.piesocket.com/v3/1?api_key=XL79hMbNWHfBYBO4qN0eQZFCGE3ZA5y0A4NjnGiL&notify_self=1"
+            );
+
+            this.socket.onopen = () => {};
+
+            this.socket.onmessage = (event) => {
+              const message = event.data;
+
+              console.log("message", message);
+
+              let message_obj = JSON.parse(message);
+
+              if (message_obj.fullName != this.fullName) {
+                message_obj["avatar_url"] =
+                  "https://api.dicebear.com/6.x/adventurer/svg?seed=Abby";
+              } else {
+                message_obj["avatar_url"] = this.avatar_url;
+              }
+
+              this.chat_messages.push(message_obj);
+            };
+
+            this.socket.onclose = (event) => {
+              if (event.wasClean) {
+              } else {
+              }
+            };
+          },
+
+          handleLogin() {
+            this.fullName = this.fullName.trim();
+            this.showLoginForm = false;
+
+            let payload = {
+              fullName: this.fullName,
+              type: "join",
+              message: "join this chat",
+            };
+
+            this.socket.send(JSON.stringify(payload));
+          },
+
+          handleLogout() {
+            this.fullName = null;
+            this.showLoginForm = true;
+          },
+
+          submitMessage() {
+            if (!this.message) {
+              return;
+            }
+
+            let payload = {
+              fullName: this.fullName,
+              type: "message",
+              message: this.message,
+            };
+
+            this.socket.send(JSON.stringify(payload));
+
+            this.message = null;
+          },
+        };
+
+        Alpine.data("store", () => storeData);
+      });
+    </script>
+  </body>
+</html>
