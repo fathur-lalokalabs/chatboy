@@ -10,10 +10,7 @@
     ></script>
   </head>
   <body>
-    <div
-      x-data="store"
-      class="min-h-screen bg-indigo-50 flex flex-col items-center justify-center"
-    >
+    <div x-data="store" class="">
       <!-- chat box -->
 
       <div class="w-80 h-96 flex flex-col border shadow-md bg-white">
@@ -216,15 +213,42 @@
     </div>
 
     <script type="text/javascript">
-
       document.addEventListener("alpine:init", () => {
+        function getRandomAvatar() {
+          var avatars = getAvatars();
+
+          if (avatars.length === 0) {
+            return null; // Return null if the avatars is empty
+          }
+
+          const randomIndex = Math.floor(Math.random() * avatars.length);
+
+          return avatars[randomIndex];
+        }
+
+        function getAvatars() {
+          var avatars = [
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Cuddles",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Abby",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Missy",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Rocky",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Lily",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Ginger",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Bella",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Kiki",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Tinkerbell",
+            "https://api.dicebear.com/6.x/adventurer/svg?seed=Bear",
+          ];
+
+          return avatars;
+        }
+
         var storeData = {
           fullName: null,
           showLoginForm: true,
           message: null,
           chat_messages: [],
-          avatar_url:
-            "https://api.dicebear.com/6.x/adventurer/svg?seed=Cuddles",
+          avatar_url: getRandomAvatar(),
           socket: null,
 
           init() {
@@ -240,13 +264,6 @@
               console.log("message", message);
 
               let message_obj = JSON.parse(message);
-
-              if (message_obj.fullName != this.fullName) {
-                message_obj["avatar_url"] =
-                  "https://api.dicebear.com/6.x/adventurer/svg?seed=Abby";
-              } else {
-                message_obj["avatar_url"] = this.avatar_url;
-              }
 
               this.chat_messages.push(message_obj);
             };
@@ -268,7 +285,7 @@
               message: "join this chat",
             };
 
-            this.socket.send(JSON.stringify(payload));
+            this.socket.send(this.setMessagePayload(payload));
           },
 
           handleLogout() {
@@ -287,9 +304,15 @@
               message: this.message,
             };
 
-            this.socket.send(JSON.stringify(payload));
+            this.socket.send(this.setMessagePayload(payload));
 
             this.message = null;
+          },
+
+          setMessagePayload(payload) {
+            payload["avatar_url"] = this.avatar_url;
+
+            return JSON.stringify(payload);
           },
         };
 
