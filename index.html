@@ -21,8 +21,15 @@
             <a class="hover:underline" href="#">CHAT BOY</a>
           </div>
 
-          <label class="block" for="">Enter Name:</label>
+          <div>
+            <img
+              class="rounded-full border-2 w-24 h-24 mx-auto"
+              :src="avatar_url"
+            />
+          </div>
+
           <form @submit.prevent="handleLogin">
+            <label class="block" for="">Enter Name:</label>
             <input
               type="text"
               x-model="fullName"
@@ -100,7 +107,11 @@
           <!-- end chat box action -->
         </div>
 
-        <div x-show="!showLoginForm" class="flex-1 px-4 py-4 overflow-y-auto">
+        <div
+          x-show="!showLoginForm"
+          x-ref="message_list"
+          class="flex-1 px-4 py-4 overflow-y-auto"
+        >
           <!-- chat message -->
 
           <template x-if="chat_messages.length > 0">
@@ -123,12 +134,14 @@
                     </div>
                     <div
                       class="flex-1 bg-indigo-400 text-white p-2 rounded-lg mb-2 relative"
+                      x-bind:class="{ 'bg-gray-400': chat_message.type === 'join', 'bg-indigo-400': chat_message.type === 'message' }"
                     >
                       <div x-text="chat_message.message"></div>
 
                       <!-- arrow -->
                       <div
-                        class="absolute left-0 top-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2 bg-indigo-400"
+                        x-bind:class="{ 'bg-gray-400': chat_message.type === 'join', 'bg-indigo-400': chat_message.type === 'message' }"
+                        class="absolute left-0 top-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2"
                       ></div>
                       <!-- end arrow -->
                     </div>
@@ -173,8 +186,8 @@
                 type="text"
                 value=""
                 placeholder="Aa"
-                autofocus
                 x-model="message"
+                x-ref="message_input"
               />
             </div>
 
@@ -279,6 +292,10 @@
             this.fullName = this.fullName.trim();
             this.showLoginForm = false;
 
+            this.$nextTick(() => {
+              this.$refs.message_input.focus();
+            });
+
             let payload = {
               fullName: this.fullName,
               type: "join",
@@ -307,6 +324,11 @@
             this.socket.send(this.setMessagePayload(payload));
 
             this.message = null;
+
+            this.$nextTick(() => {
+              this.$refs.message_list.scrollTop =
+                this.$refs.message_list.scrollHeight;
+            });
           },
 
           setMessagePayload(payload) {
