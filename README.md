@@ -20,6 +20,14 @@
 </script>
 ```
 
+## DEMO
+
+https://codepen.io/Muhammad-Fathur/pen/yLQRKRV
+
+### IFRAME source
+
+https://fathur-lalokalabs.github.io/chatboy/
+
 ## DEVELOPMENT
 
 1) Enable `dev_mode`, once its enable you can user local copy of chatboy.js. Refer to `test.html`
