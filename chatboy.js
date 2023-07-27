@@ -22,7 +22,7 @@
         iframe_id: "chatboy_iframe",
         iframe_class: "",
       },
-      trusted_origins: ["https://cyberfly.github.io/vue-chat-demo/"],
+      trusted_origins: ["https://fathur-lalokalabs.github.io/chatboy"],
       is_loading_script: false,
       is_script_loaded: false,
       embed_height: null,
@@ -42,6 +42,27 @@
           }
         }
       }
+
+      // 1. create empty div to embed iframe
+
+      const emptyDiv = document.createElement("div");
+      emptyDiv.id = "chatboy_embed_div";
+
+      var dom_element = document.body.appendChild(emptyDiv);
+
+      // 2. embed iframe
+
+      var chatboy_src = this.trusted_origins[0] + "/index.html";
+
+      if (this.settings.dev_mode) {
+        chatboy_src = getBaseUrl() + "/index.html";
+      }
+
+      // console.log("var base_url = getBaseUrl();", getBaseUrl());
+
+      // var chat_url = "http://127.0.0.1:5500/index.html";
+
+      _chatboy.showEmbed(chatboy_src, dom_element);
     };
 
     // end use init to custom config
@@ -87,7 +108,7 @@
       );
 
       iframe_container.style["max-width"] = "340px";
-      iframe_container.style["max-height"] = "400px";
+      iframe_container.style["max-height"] = "385px";
 
       var iframe = document.createElement("iframe");
 
@@ -120,18 +141,6 @@
       });
     }
 
-    function updateIframeHeight(embed_height) {
-      var px_embed_height = embed_height + "px";
-
-      var iframe = document.getElementById("chatboy_iframe");
-
-      iframe.style.height = embed_height + "px";
-
-      _chatboy.embed_height = px_embed_height;
-
-      fireEvent("onOtpAfterLoad", {});
-    }
-
     // end business logic
 
     // helper
@@ -157,7 +166,7 @@
         return (
           "div#" +
           _chatboy.iframe_settings.iframe_container_id +
-          " { position: fixed; bottom: 0; right:0; width: 100%; background-color: white; }"
+          " { position: fixed; bottom: 0; right:0; width: 100%; background-color: transparent; }"
         );
       }
 
@@ -172,52 +181,6 @@
       var custom_event = new CustomEvent(event_name, { detail: payload });
 
       window.dispatchEvent(custom_event);
-    }
-
-    function handleKeypressCallback(keycode) {
-      // if user press escape
-      if (keycode == 27) {
-        if (_chatboy.settings.ui_mode == "modal") {
-          _chatboy.closeModal();
-        } else {
-          // do something
-        }
-      }
-
-      fireEvent("onOtpKeypress", { keycode: keycode });
-    }
-
-    function loadScript(url, callback) {
-      var script = document.createElement("script");
-
-      script.type = "text/javascript";
-      script.async = true;
-      script.src = url;
-
-      var entry = document.getElementsByTagName("script")[0];
-      entry.parentNode.insertBefore(script, entry);
-
-      if (script.addEventListener)
-        script.addEventListener("load", callback, false);
-      else {
-        script.attachEvent("onreadystatechange", function () {
-          if (/complete|loaded/.test(script.readyState)) callback();
-        });
-      }
-    }
-
-    function loadStylesheet(url, callback) {
-      var link = document.createElement("link");
-
-      link.rel = "stylesheet";
-      link.type = "text/css";
-      link.href = url;
-
-      // Append <link/> tag
-      var entry = document.getElementsByTagName("script")[0];
-      entry.parentNode.insertBefore(link, entry);
-
-      callback();
     }
 
     function getBaseUrl() {
