@@ -16,7 +16,12 @@
 ```
 <script>
     // once document ready, init
-    chatboy.init();
+
+    var options = {
+        site_key: "123asdf";
+    };
+
+    chatboy.init(options);
 </script>
 ```
 
@@ -30,13 +35,18 @@ https://fathur-lalokalabs.github.io/chatboy/
 
 ## DEVELOPMENT
 
-1) Enable `dev_mode`, once its enable you can user local copy of chatboy.js. Refer to `test.html`
+1) Enable `dev_mode`, once its enable you can load the local copy of chatboy.js. Refer to `test.html`
 
 ```
 <script src="chatboy.js"></script>
 
 <script>
-    chatboy.init({ dev_mode: true });
+    var options = {
+        site_key: "123asdf";
+        dev_mode: true
+    };
+
+    chatboy.init(options);
 </script>
 ```
 

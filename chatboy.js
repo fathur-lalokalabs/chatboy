@@ -12,6 +12,7 @@
       ui_mode: "embed", // embed / sticky
       url_storage_key: "chatboy_form_url",
       dev_mode: false,
+      site_key: null,
     };
 
     var _chatboy = {
@@ -43,6 +44,13 @@
         }
       }
 
+      // 0. site_key is required
+
+      if (!this.settings.site_key) {
+        console.error('chatboy: site_key is required!');
+        return;
+      }
+
       // 1. create empty div to embed iframe
 
       const emptyDiv = document.createElement("div");
@@ -57,10 +65,6 @@
       if (this.settings.dev_mode) {
         chatboy_src = getBaseUrl() + "/index.html";
       }
-
-      // console.log("var base_url = getBaseUrl();", getBaseUrl());
-
-      // var chat_url = "http://127.0.0.1:5500/index.html";
 
       _chatboy.showEmbed(chatboy_src, dom_element);
     };
@@ -94,7 +98,7 @@
     }
 
     function embedChatbox(chatbox_url, embed_container) {
-      fireEvent("onOtpBeforeLoad", {});
+      fireEvent("onChatboyBeforeLoad", {});
 
       var iframe_container = document.createElement("div");
 
@@ -138,6 +142,15 @@
 
       iframe.addEventListener("load", function () {
         // do something
+
+        var parentPayload = JSON.stringify({
+          type: "init",
+          options: {
+            site_key: _chatboy.settings.site_key,
+          },
+        });
+
+        iframe.contentWindow.postMessage(parentPayload, getBaseUrl());
       });
     }
 
@@ -189,37 +202,6 @@
       var base_url = parse_origin.origin;
 
       return base_url;
-    }
-
-    function getAssetPath(filename) {
-      var version =
-        arguments.length > 1 && arguments[1] !== undefined
-          ? arguments[1]
-          : "v1";
-
-      var file_extension = filename.split(".").pop();
-
-      var path = "/sdk/" + version + "/";
-
-      if (file_extension === "css") {
-        path = "/sdk/" + version + "/";
-      }
-
-      if (_chatboy.settings.dev_mode) {
-        path = "/dist/";
-      }
-
-      return path;
-    }
-
-    function getAssetUrl(filename) {
-      var base_url = getBaseUrl();
-
-      var path = getAssetPath(filename);
-
-      var asset_url = base_url + path + filename;
-
-      return asset_url;
     }
 
     // end helper
