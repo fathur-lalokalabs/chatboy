@@ -1,5 +1,7 @@
 ## ChatBoy MVP
 
+Simple concept of Help Chat at website, each website has one unique chatroom.
+
 ## HOW TO USE
 
 1) Add script before closing of HTML body tag
@@ -27,7 +29,13 @@
 
 ## DEMO
 
+Site 1
+
 https://codepen.io/Muhammad-Fathur/pen/yLQRKRV
+
+Site 2
+
+https://codepen.io/Muhammad-Fathur/pen/abQPaZL
 
 ### IFRAME source
 
