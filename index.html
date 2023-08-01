@@ -231,16 +231,6 @@
     </div>
 
     <script type="text/javascript">
-      var site_key = null;
-
-      window.addEventListener("message", function (event) {
-        var message_data = JSON.parse(event.data);
-
-        if (message_data.type === "init") {
-          site_key = message_data.options.site_key;
-        }
-      });
-
       document.addEventListener("alpine:init", () => {
         function getRandomAvatar() {
           var avatars = getAvatars();
@@ -277,35 +267,50 @@
           message: null,
           chat_messages: [],
           avatar_url: getRandomAvatar(),
+          site_key: null,
           socket: null,
 
           init() {
-            var room = site_key;
+            var self = this;
 
-            var socket_url =
-              "wss://free.nyc1.piesocket.com/v3/" +
-              room +
-              "?api_key=XL79hMbNWHfBYBO4qN0eQZFCGE3ZA5y0A4NjnGiL&notify_self=1";
+            window.addEventListener("message", function (event) {
+              var message_data = JSON.parse(event.data);
 
-            this.socket = new WebSocket(socket_url);
+              console.log("message_data", message_data);
 
-            this.socket.onopen = () => {};
-
-            this.socket.onmessage = (event) => {
-              const message = event.data;
-
-              console.log("message", message);
-
-              let message_obj = JSON.parse(message);
-
-              this.chat_messages.push(message_obj);
-            };
-
-            this.socket.onclose = (event) => {
-              if (event.wasClean) {
-              } else {
+              if (message_data.type === "init") {
+                self.site_key = message_data.options.site_key;
               }
-            };
+            });
+
+            this.$watch("site_key", (new_site_key) => {
+              if (new_site_key) {
+                var socket_url =
+                  "wss://free.nyc1.piesocket.com/v3/" +
+                  new_site_key +
+                  "?api_key=XL79hMbNWHfBYBO4qN0eQZFCGE3ZA5y0A4NjnGiL&notify_self=1";
+
+                this.socket = new WebSocket(socket_url);
+
+                this.socket.onopen = () => {};
+
+                this.socket.onmessage = (event) => {
+                  const message = event.data;
+
+                  console.log("message", message);
+
+                  let message_obj = JSON.parse(message);
+
+                  this.chat_messages.push(message_obj);
+                };
+
+                this.socket.onclose = (event) => {
+                  if (event.wasClean) {
+                  } else {
+                  }
+                };
+              }
+            });
           },
 
           handleLogin() {
