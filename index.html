@@ -55,10 +55,10 @@
         >
           <!-- user info -->
           <div class="flex items-center">
-            <img class="rounded-full w-10 h-10" :src="avatar_url" />
+            <img class="rounded-full w-10 h-10" :src="user.avatar_url" />
             <div class="pl-2">
               <div class="font-semibold">
-                <a class="hover:underline" href="#" x-text="fullName"></a>
+                <a class="hover:underline" href="#" x-text="user.name"></a>
               </div>
               <div class="text-xs text-gray-600">Online</div>
             </div>
@@ -120,21 +120,21 @@
                 ><li>
                   <div class="flex items-center mb-4">
                     <div
-                      class="flex-none flex flex-col items-center space-y-1 mr-4"
+                      class="flex-none flex-grow-0 flex flex-col items-center space-y-1 mr-4"
                     >
                       <img
                         class="rounded-full w-10 h-10"
-                        :src="chat_message.avatar_url"
+                        :src="chat_message.user.avatar_url"
                       />
                       <a
                         href="#"
                         class="block text-xs hover:underline"
-                        x-text="chat_message.fullName"
+                        x-text="chat_message.user.name"
                       ></a>
                     </div>
                     <div
                       class="flex-1 bg-indigo-400 text-white p-2 rounded-lg mb-2 relative"
-                      x-bind:class="{ 'bg-gray-400': chat_message.type === 'join', 'bg-indigo-400': chat_message.type === 'message' }"
+                      x-bind:class="{ 'bg-indigo-400': chat_message.user.role === 'user', 'bg-gray-600': chat_message.user.role === 'cs' }"
                     >
                       <div x-text="chat_message.message"></div>
 
@@ -145,7 +145,7 @@
 
                       <!-- arrow -->
                       <div
-                        x-bind:class="{ 'bg-gray-400': chat_message.type === 'join', 'bg-indigo-400': chat_message.type === 'message' }"
+                        x-bind:class="{ 'bg-indigo-400': chat_message.user.role === 'user', 'bg-gray-600': chat_message.user.role === 'cs' }"
                         class="absolute left-0 top-1/2 transform -translate-x-1/2 rotate-45 w-2 h-2"
                       ></div>
                       <!-- end arrow -->
@@ -201,21 +201,30 @@
             <div>
               <button
                 class="inline-flex hover:bg-indigo-50 rounded-full p-2"
-                type="button"
+                type="submit"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#000000"
                   class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
                   stroke="currentColor"
+                  version="1.1"
+                  id="Layer_1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  viewBox="0 0 512.708 512.708"
+                  xml:space="preserve"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
+                  <g transform="translate(0 -1)">
+                    <g>
+                      <path
+                        d="M504.307,6.266c-2.656-2.274-5.865-3.913-9.447-4.6c-4.288-0.937-8.926-0.525-13.372,1.727L14.047,173.371
+			c-16.138,5.869-19.083,27.427-5.109,37.409L150.843,312.14l20.042,140.297c2.688,18.815,26.782,24.988,38.186,9.783l50.337-67.115
+			l132.039,113.252c12.494,10.716,31.903,3.845,34.872-12.345l85.995-468.928C513.971,18.046,510.226,10.669,504.307,6.266z
+			 M389.424,82.27L169.398,272.96L66.718,199.618L389.424,82.27z M205.84,395.417l-12.404-86.83l185.161-160.473L240.324,349.239
+			l-1.738,2.517L205.84,395.417z M391.048,451.803l-106.576-91.412l167.949-243.252L391.048,451.803z"
+                      />
+                    </g>
+                  </g>
                 </svg>
               </button>
             </div>
@@ -244,6 +253,59 @@
           return avatars[randomIndex];
         }
 
+        function generateUniqueID() {
+          return Math.random().toString(36).substr(2, 9);
+        }
+
+        function getUniqueID() {
+          let uniqueID = window.sessionStorage.getItem("uniqueID");
+          if (!uniqueID) {
+            uniqueID = generateUniqueID();
+            window.sessionStorage.setItem("uniqueID", uniqueID);
+          }
+          return uniqueID;
+        }
+
+        function getUser() {
+          let current_user = window.sessionStorage.getItem("current_user");
+
+          if (current_user) {
+            return JSON.parse(current_user);
+          }
+
+          return current_user;
+        }
+
+        function getCsUser() {
+          var user = {
+            id: getUniqueID(),
+            name: "HelpDesk",
+            email: "cs@chatboy.test",
+            avatar_url: getRandomAvatar(),
+            role: "cs",
+          };
+
+          return user;
+        }
+
+        function setUser(name, email, avatar_url) {
+          var user = {
+            id: getUniqueID(),
+            name: name,
+            email: email,
+            avatar_url: avatar_url,
+            role: "user",
+          };
+
+          let current_user = window.sessionStorage.getItem("current_user");
+
+          if (!current_user) {
+            window.sessionStorage.setItem("current_user", JSON.stringify(user));
+          }
+
+          return user;
+        }
+
         function getAvatars() {
           var avatars = [
             "https://api.dicebear.com/6.x/adventurer/svg?seed=Cuddles",
@@ -261,11 +323,73 @@
           return avatars;
         }
 
+        function getCustomerServiceReplies() {
+          var replies = [
+            "Thank you for reaching out! We appreciate your feedback and are here to assist you with any questions or concerns you may have.",
+            "I'm sorry to hear about the inconvenience caused. We'll do our best to resolve this issue promptly.",
+            "We apologize for any misunderstanding. Let's work together to find the best solution for you.",
+            "We understand your frustration and value your patience. Our team is actively looking into this matter.",
+            "We are glad to be of service! Don't hesitate to ask if there's anything else we can help you with.",
+            "Your satisfaction is our top priority. Please let us know how we can assist you further.",
+            "Thank you for your patience. We are working hard to resolve this matter and will update you as soon as we have a solution.",
+            "We appreciate your loyalty. As a valued customer, your feedback is essential to us.",
+            "We apologize for the inconvenience. Rest assured, we are taking steps to prevent similar issues in the future.",
+            "Our team is dedicated to providing excellent customer service. Please feel free to contact us anytime.",
+            "We are committed to your satisfaction. Let us know how we can make your experience better.",
+            "Your feedback is invaluable to us. We are continuously striving to improve our services.",
+            "Thank you for bringing this to our attention. We will investigate and address the issue promptly.",
+            "We understand the importance of your concern and are working diligently to find a resolution.",
+            "Our support team is ready to assist you 24/7. Feel free to get in touch at any time.",
+          ];
+
+          return replies;
+        }
+
+        function getRandomCustomerServiceReply() {
+          var replies = getCustomerServiceReplies();
+
+          const randomIndex = Math.floor(Math.random() * replies.length);
+          return replies[randomIndex];
+        }
+
+        function checkUserLoggedIn() {
+          const user = getUser();
+
+          let isLoggedIn = false;
+
+          if (user !== undefined && user !== null) {
+            isLoggedIn = true;
+          } else {
+            isLoggedIn = false;
+          }
+
+          return isLoggedIn;
+        }
+
+        function getChatMessages() {
+          let chat_messages = window.sessionStorage.getItem("chat_messages");
+
+          if (chat_messages) {
+            return JSON.parse(chat_messages);
+          }
+
+          return [];
+        }
+
+        function convertToNormalObject(reactive_object) {
+          const object = JSON.parse(JSON.stringify(reactive_object));
+
+          return object;
+        }
+
         var storeData = {
           fullName: null,
-          showLoginForm: true,
+          email: null,
+          user: getUser(),
+          cs_user: getCsUser(),
+          showLoginForm: !checkUserLoggedIn(),
           message: null,
-          chat_messages: [],
+          chat_messages: getChatMessages(),
           avatar_url: getRandomAvatar(),
           site_key: null,
           socket: null,
@@ -285,9 +409,11 @@
 
             this.$watch("site_key", (new_site_key) => {
               if (new_site_key) {
+                var room = new_site_key + getUniqueID();
+
                 var socket_url =
                   "wss://free.nyc1.piesocket.com/v3/" +
-                  new_site_key +
+                  room +
                   "?api_key=XL79hMbNWHfBYBO4qN0eQZFCGE3ZA5y0A4NjnGiL&notify_self=1";
 
                 this.socket = new WebSocket(socket_url);
@@ -311,6 +437,26 @@
                 };
               }
             });
+
+            this.$watch("chat_messages", (newValue) => {
+              if (newValue.length > 0) {
+                const lastItem = newValue[newValue.length - 1];
+
+                if (lastItem.user.email != "cs@chatboy.test") {
+                  this.csReply();
+                }
+
+                window.sessionStorage.setItem(
+                  "chat_messages",
+                  JSON.stringify(newValue)
+                );
+              }
+
+              this.$nextTick(() => {
+                this.$refs.message_list.scrollTop =
+                  this.$refs.message_list.scrollHeight;
+              });
+            });
           },
 
           handleLogin() {
@@ -321,19 +467,30 @@
               this.$refs.message_input.focus();
             });
 
+            var current_user = setUser(
+              this.fullName,
+              this.email,
+              this.avatar_url
+            );
+
+            this.user = current_user;
+
             let payload = {
-              fullName: this.fullName,
+              user: convertToNormalObject(this.user),
               type: "join",
               message: "join this chat",
               created_at: new Date(),
             };
 
-            this.socket.send(this.setMessagePayload(payload));
+            this.socket.send(JSON.stringify(payload));
           },
 
           handleLogout() {
             this.fullName = null;
+            this.chat_messages = [];
             this.showLoginForm = true;
+
+            window.sessionStorage.removeItem("current_user");
           },
 
           submitMessage() {
@@ -342,26 +499,26 @@
             }
 
             let payload = {
-              fullName: this.fullName,
+              user: convertToNormalObject(this.user),
               type: "message",
               message: this.message,
               created_at: new Date(),
             };
 
-            this.socket.send(this.setMessagePayload(payload));
+            this.socket.send(JSON.stringify(payload));
 
             this.message = null;
-
-            this.$nextTick(() => {
-              this.$refs.message_list.scrollTop =
-                this.$refs.message_list.scrollHeight;
-            });
           },
 
-          setMessagePayload(payload) {
-            payload["avatar_url"] = this.avatar_url;
+          csReply() {
+            let payload = {
+              user: convertToNormalObject(this.cs_user),
+              type: "message",
+              message: getRandomCustomerServiceReply(),
+              created_at: new Date(),
+            };
 
-            return JSON.stringify(payload);
+            this.socket.send(JSON.stringify(payload));
           },
         };
 
